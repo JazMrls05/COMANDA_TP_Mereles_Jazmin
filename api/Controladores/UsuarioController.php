@@ -9,14 +9,14 @@ class UsuarioController
     {
         $parsear_datos = $request->getParsedBody();
 
-        $usuario = new Usuario($parsear_datos['nombre'], $parsear_datos['apellido'],
+        $usuario = new Usuario($parsear_datos['perfil'],$parsear_datos['nombre'], $parsear_datos['apellido'],
         $parsear_datos['clave'],$parsear_datos['sector'],$parsear_datos['fechaIngreso']);
 
-        $array_datos = [$usuario->nombre, $usuario->apellido,
+        $array_datos = [$usuario->perfil,$usuario->nombre, $usuario->apellido,
         $usuario->clave,$usuario->sector, $usuario->fechaIngreso];
 
         $tabla = 'usuarios';
-        $array_encabezados = ['nombre', 'apellido', 'clave','sector','fechaIngreso'];
+        $array_encabezados = ['perfil','nombre', 'apellido', 'clave','sector','fechaIngreso'];
         
         if (AccesoDatos::insert($response, $tabla, $array_encabezados, $array_datos))
         {

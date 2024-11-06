@@ -9,12 +9,12 @@ class MesaController
     {
         $parsear_datos = $request->getParsedBody();
 
-        $mesa = new Mesa($parsear_datos['codigoMesa'],$parsear_datos['estado']);
+        $mesa = new Mesa($parsear_datos['codigoMesa'], $parsear_datos['cantidadPersonas'],$parsear_datos['estado']);
 
-        $array_datos = ["M" . $mesa->codigoMesa, $mesa->estado];
+        $array_datos = ["M" . $mesa->codigoMesa, $mesa->cantidadPersonas, $mesa->estado];
 
         $tabla = 'mesas';
-        $array_encabezados = ['codigoMesa','estado'];
+        $array_encabezados = ['codigoMesa','cantidadPersonas', 'estado'];
         
         if (AccesoDatos::insert($response, $tabla, $array_encabezados, $array_datos))
         {
@@ -37,9 +37,9 @@ class MesaController
 
     public function EliminarPorCodigo($request,$response,$args)
     {
-        $id = $args['id'];
-        AccesoDatos::deleteID($response, "mesas", $id);
-        $response->getBody()->write(json_encode(["Mesa $id" => "Fue eliminado exitosamente"], JSON_PRETTY_PRINT));
+        $codigo = $args['codigo'];
+        AccesoDatos::deleteCodigo($response, "mesas", "codigoMesa", $codigo);
+        $response->getBody()->write(json_encode(["Mesa $codigo" => "Fue eliminado exitosamente"], JSON_PRETTY_PRINT));
         return $response;
     }
 }

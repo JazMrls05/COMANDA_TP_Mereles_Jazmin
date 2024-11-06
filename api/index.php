@@ -19,6 +19,8 @@ require_once __DIR__ . '/Controladores/ProductoController.php';
 require_once __DIR__ . '/Controladores/MesaController.php';
 require_once __DIR__ . '/Controladores/PedidoController.php';
 
+require_once __DIR__ . '/Middlewares/AuthMwAdmin.php';
+
 
 // Instantiate App
 $app = AppFactory::create();
@@ -36,7 +38,7 @@ $app->group('/usuarios', function (RouteCollectorProxy $group) {
     $group->get('/sector/{sector}', \UsuarioController::class . ':VerPorSector');
     $group->post('[/]', \UsuarioController::class . ':Guardar');
     $group->delete('/{id}', \UsuarioController::class . ':EliminarPorID');
-});
+})->add(\AuthMWAdmin::class . ":__invoke");
 
 $app->group('/productos', function (RouteCollectorProxy $group) {
     $group->get('[/]', \ProductoController::class . ':VerTodos');
@@ -48,9 +50,9 @@ $app->group('/productos', function (RouteCollectorProxy $group) {
 $app->group('/pedidos', function (RouteCollectorProxy $group) {
     $group->get('[/]', \PedidoController::class . ':VerTodos');
     $group->get('/estado/{estado}', \PedidoController::class . ':VerTodosPorEstado');
-    $group->get('/{id}', \PedidoController::class . ':VerPorID');
+    $group->get('/{codigo}', \PedidoController::class . ':VerPorCodigo');
     $group->post('[/]', \PedidoController::class . ':Guardar');
-    $group->delete('/{id}', \PedidoController::class . ':EliminarPorID');
+    $group->delete('/{codigo}', \PedidoController::class . ':EliminarPorCodigo');
 });
 
 
@@ -59,7 +61,7 @@ $app->group('/mesas', function (RouteCollectorProxy $group) {
     $group->get('/estado/{estado}', \MesaController::class . ':VerTodosPorEstado');
     $group->get('/tiempo', \MesaController::class . ':VerTiempoRestante');
     $group->post('[/]', \MesaController::class . ':Guardar');
-    $group->delete('/{id}', \MesaController::class . ':EliminarPorID');
+    $group->delete('/{codigo}', \MesaController::class . ':EliminarPorCodigo');
 });
 
 
