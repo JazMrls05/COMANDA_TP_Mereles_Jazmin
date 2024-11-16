@@ -5,11 +5,12 @@ require_once __DIR__ . '/../DB/AccesoDatos.php';
 
 class MesaController
 {
+    #region INSERT
     public function Guardar($request, $response)
     {
         $parsear_datos = $request->getParsedBody();
 
-        $mesa = new Mesa($parsear_datos['codigoMesa'], $parsear_datos['cantidadPersonas'],$parsear_datos['estado']);
+        $mesa = new Mesa($parsear_datos['codigoMesa'], $parsear_datos['cantidadPersonas'], $parsear_datos['estado']);
 
         $array_datos = ["M" . $mesa->codigoMesa, $mesa->cantidadPersonas, $mesa->estado];
 
@@ -27,7 +28,26 @@ class MesaController
 
         return $response;
     }
+
+    public function GuardarDesdeCSV($request, $response)
+    {
+        $tabla = 'mesas';
+        $nombreArchivo = 'mesa.csv';
+        
+        if (AccesoDatos::insertDesdeCSV($response, $tabla, $nombreArchivo))
+        {
+            $response->getBody()->write(json_encode(["mensaje" => "Mesa cargada exitosamente a $nombreArchivo"]));
+        }
+        else
+        {
+            $response->getBody()->write(json_encode(["mensaje" => "Hubo un problema al cargar la mesa a $nombreArchivo"]));
+        }
+
+        return $response;
+    }
+    #endregion
     
+    #region SELECT
     public function VerTodos($request, $response)
     {
         $lista_mesas = AccesoDatos::selectAll($response, "mesas");
@@ -35,6 +55,26 @@ class MesaController
         return $response;
     }
 
+    public function VerTodosPorEstado($request, $response,$args)
+    {
+        $estado = $args['estado'];
+        $lista_mesas = AccesoDatos::selectCriterioSTR($response, "mesas", 'estado', $estado);
+        $response->getBody()->write(json_encode(["Mesas" => $lista_mesas], JSON_PRETTY_PRINT));
+        return $response;
+    }
+    #endregion
+    
+    #region UPDATE
+    public static function ModificarEstado($request, $response, $args)
+    {
+        $codigo = $args['codigo'];
+        AccesoDatos::update($response, 'mesas', 'estado', 'cerrada', 'codigo', '=', $codigo);
+        $response->getBody()->write(json_encode(["Mesa $codigo" => "Ha sido cerrada."], JSON_PRETTY_PRINT));
+        return $response;
+    }
+    #endregion
+
+    #region DELETE
     public function EliminarPorCodigo($request,$response,$args)
     {
         $codigo = $args['codigo'];
@@ -42,4 +82,5 @@ class MesaController
         $response->getBody()->write(json_encode(["Mesa $codigo" => "Fue eliminado exitosamente"], JSON_PRETTY_PRINT));
         return $response;
     }
+    #endregion
 }

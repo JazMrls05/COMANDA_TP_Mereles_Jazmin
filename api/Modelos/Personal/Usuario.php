@@ -7,17 +7,15 @@ class Usuario
     public $perfil; // admin, empleado
     public $sector; // administración ; cocina, barra o choperas
     public $nombre;
-    public $apellido;
     public $clave;
     public $fechaIngreso;
     #endregion
 
     #region Constructor
-    public function __construct($perfil, $nombre, $apellido, $clave, $sector = null, $fechaIngreso= null)
+    public function __construct($perfil, $nombre, $clave, $sector = null, $fechaIngreso = '')
     {
         $this -> perfil = $perfil;
         $this -> nombre = $nombre;
-        $this -> apellido = $apellido;
         $this -> clave = $clave;
         $this -> sector = $sector;
         if ($fechaIngreso === '') 

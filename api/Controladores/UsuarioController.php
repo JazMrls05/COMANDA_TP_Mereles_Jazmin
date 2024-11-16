@@ -5,18 +5,18 @@ require_once __DIR__ . '/../Modelos/Personal/Usuario.php';
 class UsuarioController
 {
 
+    #region INSERT
     public function Guardar($request, $response)
     {
         $parsear_datos = $request->getParsedBody();
 
-        $usuario = new Usuario($parsear_datos['perfil'],$parsear_datos['nombre'], $parsear_datos['apellido'],
+        $usuario = new Usuario($parsear_datos['perfil'],$parsear_datos['nombre'], 
         $parsear_datos['clave'],$parsear_datos['sector'],$parsear_datos['fechaIngreso']);
 
-        $array_datos = [$usuario->perfil,$usuario->nombre, $usuario->apellido,
-        $usuario->clave,$usuario->sector, $usuario->fechaIngreso];
+        $array_datos = [$usuario->perfil,$usuario->nombre,$usuario->clave,$usuario->sector, $usuario->fechaIngreso];
 
         $tabla = 'usuarios';
-        $array_encabezados = ['perfil','nombre', 'apellido', 'clave','sector','fechaIngreso'];
+        $array_encabezados = ['perfil','nombre', 'clave','sector','fechaIngreso'];
         
         if (AccesoDatos::insert($response, $tabla, $array_encabezados, $array_datos))
         {
@@ -30,6 +30,26 @@ class UsuarioController
         return $response;
     }
 
+    public function GuardarDesdeCSV($request, $response)
+    {
+        $tabla = 'usuarios';
+        $nombreArchivo = 'usuario.csv';
+        
+        if (AccesoDatos::insertDesdeCSV($response, $tabla, $nombreArchivo))
+        {
+            $response->getBody()->write(json_encode(["mensaje" => "Usuario cargado exitosamente a $nombreArchivo"]));
+        }
+        else
+        {
+            $response->getBody()->write(json_encode(["mensaje" => "Hubo un problema al cargar el usuario a $nombreArchivo"]));
+        }
+
+        return $response;
+    }
+
+    #endregion
+
+    #region SELECT
     public function VerTodos($request, $response)
     {
         $lista_usuarios = AccesoDatos::selectAll($response, "usuarios");
@@ -40,7 +60,7 @@ class UsuarioController
     public function VerPorID($request,$response,$args)
     {
         $id = $args['id'];
-        $usuario = AccesoDatos::selectID($response, "usuarios", $id);
+        $usuario = AccesoDatos::selectCriterioINT($response, "usuarios", 'id', $id);
         $response->getBody()->write(json_encode(["Usuario" => $usuario], JSON_PRETTY_PRINT));
         return $response;
     }
@@ -48,16 +68,14 @@ class UsuarioController
     public function VerPorSector($request,$response,$args)
     {
         $sector = $args['sector'];
-        $usuario = AccesoDatos::selectSector($response, "usuarios", $sector);
+        $usuario = AccesoDatos::selectCriterioSTR($response, "usuarios", 'sector',$sector);
         $response->getBody()->write(json_encode(["Usuario" => $usuario], JSON_PRETTY_PRINT));
         return $response;
     }
 
-    public function Modificar($request, $response, $args)
-    {
+    #endregion
 
-    }
-
+    #region DELETE
     public function EliminarPorID($request,$response,$args)
     {
         $id = $args['id'];
@@ -65,7 +83,7 @@ class UsuarioController
         $response->getBody()->write(json_encode(["Usuario $id" => "Fue eliminado exitosamente"], JSON_PRETTY_PRINT));
         return $response;
     }
-
+    #endregion
 
 
 

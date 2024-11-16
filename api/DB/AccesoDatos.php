@@ -17,6 +17,8 @@ class AccesoDatos
         }
     }
 
+
+    #region INSERT
     public static function insert($response, $tabla, $array_encabezados, $array_datos)
     {
         try
@@ -35,6 +37,42 @@ class AccesoDatos
         }
     }
 
+    public static function insertDesdeCSV($response, $tabla, $nombreArchivo)
+    {
+        try
+        {
+
+            if (($archivo = fopen($nombreArchivo, "r")) !== false) 
+            {
+                $accesoDatos = new AccesoDatos();
+                $encabezados = fgetcsv($archivo, 1000, ","); /* El archivo csv que pase, va a tener encabezados con los mismos nombres
+                de las columnas de la respectiva tabla*/
+                $valores = implode(',', array_fill(0, count($encabezados), '?'));
+                $consulta = "INSERT INTO $tabla ($encabezados) VALUES ($valores)";
+                $consultaPreparada = $accesoDatos->_pdo->prepare($consulta);
+
+                while (($datos = fgetcsv($archivo, 1000, ",")) !== false)
+                {
+                    $consultaPreparada->execute($datos);
+                }
+
+                fclose($archivo);
+                $response->getBody()->write(json_encode(["Mensaje" => "Datos cargados exitosamente"]));
+            }
+            else
+            {
+                $response->getBody()->write(json_encode(["Mensaje" => "Hubo un probelam al intentar abrir el archivo"]));
+            }
+
+        }
+        catch(PDOException $e)
+        {
+            return $response->getBody()->write(json_encode(["Error" => $e->getMessage()]));
+        }
+    }
+    #endregion
+
+    #region SELECT
     public static function selectAll($response, $tabla)
     {
         try
@@ -51,14 +89,14 @@ class AccesoDatos
         }
     }
 
-    public static function selectID($response, $tabla, $id)
+    public static function selectCriterioINT($response, $tabla, $nombreDato ,$datoVal) // Por ejemplo: un ID
     {
         try
         {
             $accesoDatos = new AccesoDatos();
-            $consulta = "SELECT * FROM $tabla WHERE id = :id";
+            $consulta = "SELECT * FROM $tabla WHERE $nombreDato = :$nombreDato";
             $sentencia = $accesoDatos->_pdo->prepare($consulta);
-            $sentencia->bindParam(':id', $id, PDO::PARAM_INT);
+            $sentencia->bindParam(":$nombreDato", $datoVal, PDO::PARAM_INT);
             $sentencia-> execute();
             return $sentencia-> FetchAll(PDO::FETCH_ASSOC);
         }
@@ -68,14 +106,14 @@ class AccesoDatos
         }
     }
 
-    public static function selectSector($response, $tabla, $sector)
+    public static function selectCriterioSTR($response, $tabla, $nombreDato ,$datoVal) // Por ejemplo: sector, código alfnum, tipo
     {
         try
         {
             $accesoDatos = new AccesoDatos();
-            $consulta = "SELECT * FROM $tabla WHERE sector = :sector";
+            $consulta = "SELECT * FROM $tabla WHERE $nombreDato = :$nombreDato";
             $sentencia = $accesoDatos->_pdo->prepare($consulta);
-            $sentencia->bindParam(':sector', $sector, PDO::PARAM_STR);
+            $sentencia->bindParam(":$nombreDato", $datoVal, PDO::PARAM_STR);
             $sentencia-> execute();
             return $sentencia-> FetchAll(PDO::FETCH_ASSOC);
         }
@@ -85,14 +123,13 @@ class AccesoDatos
         }
     }
 
-    public static function selectCodigo($response, $tabla, $nombreColumna, $codigo)
+    public static function selectLIKE($response, $tabla, $dato, $patron)
     {
         try
         {
             $accesoDatos = new AccesoDatos();
-            $consulta = "SELECT * FROM $tabla WHERE $nombreColumna = :codigo";
+            $consulta = "SELECT * FROM $tabla WHERE $dato LIKE $patron";
             $sentencia = $accesoDatos->_pdo->prepare($consulta);
-            $sentencia->bindParam(':codigo', $codigo, PDO::PARAM_STR);
             $sentencia-> execute();
             return $sentencia-> FetchAll(PDO::FETCH_ASSOC);
         }
@@ -102,23 +139,10 @@ class AccesoDatos
         }
     }
 
-    public static function selectTipo($response, $tabla, $tipo)
-    {
-        try
-        {
-            $accesoDatos = new AccesoDatos();
-            $consulta = "SELECT * FROM $tabla WHERE tipo = :tipo";
-            $sentencia = $accesoDatos->_pdo->prepare($consulta);
-            $sentencia->bindParam(':tipo', $tipo, PDO::PARAM_STR);
-            $sentencia-> execute();
-            return $sentencia-> FetchAll(PDO::FETCH_ASSOC);
-        }
-        catch(PDOException $e)
-        {
-            return $response->getBody()->write(json_encode(["Error" => $e->getMessage()]));
-        }
-    }
 
+    #endregion
+
+    #region UPDATE
     public static function update($response, $tabla, $datoAsetear, $valorSeteo, $datoWhere, $signoWhere, $valorWhere)
     {
         try
@@ -136,6 +160,9 @@ class AccesoDatos
         }
     }
 
+    #endregion 
+
+    #region DELETE
     public static function deleteID($response, $tabla, $id)
     {
         try
@@ -167,5 +194,7 @@ class AccesoDatos
             return $response->getBody()->write(json_encode(["Error" => $e->getMessage()]));
         }
     }
+
+    #endregion
 
 }

@@ -10,7 +10,7 @@ class Mesa
     {
         $this->codigoMesa = $codigoMesa;
         $this->cantidadPersonas = $cantidadPersonas;
-        if ($estado=== '') 
+        if ($estado === '') 
         {
             $this->estado = "Con cliente esperando pedido"; 
         } 
