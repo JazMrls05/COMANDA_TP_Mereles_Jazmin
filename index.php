@@ -21,6 +21,11 @@ require_once __DIR__ . '/Controladores/PedidoController.php';
 
 require_once __DIR__ . '/Middlewares/AuthMWLogin.php';
 require_once __DIR__ . '/Middlewares/AuthMWUsuario.php';
+require_once __DIR__ . '/Middlewares/AuthMWToken.php';
+require_once __DIR__ . '/Middlewares/AuthMWAtributosMesa.php';
+require_once __DIR__ . '/Middlewares/AuthMWAtributosProducto.php';
+require_once __DIR__ . '/Middlewares/AuthMWAtributosUsuario.php';
+
 
 
 
@@ -37,10 +42,10 @@ $app->addBodyParsingMiddleware();
 
 #region grupos solicitudes SOLO ADMIN
 $app->group('/insertar', function (RouteCollectorProxy $group) {
-    $group->post('/usuarios', \UsuarioController::class . ':Guardar');
-    $group->post('/productos', \ProductoController::class . ':Guardar');
-    $group->post('/mesas', \MesaController::class . ':Guardar');
-})->add(AuthMWUsuario::class . ':VerificarAdmin');
+    $group->post('/usuarios', \UsuarioController::class . ':Guardar')->add(AuthMWAt_Usuario::class . ':__invoke');
+    $group->post('/productos', \ProductoController::class . ':Guardar')->add(AuthMWAt_Producto::class . ':__invoke');;
+    $group->post('/mesas', \MesaController::class . ':Guardar')->add(AuthMWAt_Mesa::class . ':__invoke');;
+})->add(AuthMWUsuario::class . ':VerificarAdmin')->add(AuthMWToken::class . ':__invoke');
 
 $app->group('/insertar/csv', function (RouteCollectorProxy $group) {
     $group->post('/usuarios', \UsuarioController::class . ':GuardarDesdeCSV');
@@ -84,7 +89,7 @@ $app->group('/mesas', function (RouteCollectorProxy $group) {
     $group->put('/estado/cerrar/{codigoMesa}', \MesaController::class . ':CerrarMesa')/*->add(AuthMWUsuario::class . ':VerificarAdmin')*/;
 });
 
-$app->get('/cliente/tiempoRestante', \PedidoController::class . ':VistaCliente');
+$app->get('/cliente', \PedidoController::class . ':VistaCliente');
 
 #region JWT
 $app->group('/jwt', function (RouteCollectorProxy $group)

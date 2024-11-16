@@ -21,12 +21,12 @@ class AuthMWToken // mi token existe?
         $token = AuthJWT::ObtenerToken($request);
         try 
         {
-            AutentificadorJWT::VerificarToken($token);
+            AuthJWT::VerificarToken($token);
             $response = $handler->handle($request);
         } 
         catch (Exception $e) {
             $response = new Response();
-            $payload = json_encode(array('Mensaje' => 'ERROR: Hubo un error con el TOKEN'));
+            $payload = json_encode(array('Mensaje' => 'ERROR: Hubo un error con el TOKEN; ' . $e->getMessage()));
             $response->getBody()->write($payload);
         }
         return $response->withHeader('Content-Type', 'application/json');

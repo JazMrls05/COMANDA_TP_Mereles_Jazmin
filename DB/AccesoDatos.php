@@ -123,6 +123,22 @@ class AccesoDatos
         }
     }
 
+    public static function selectLIKE($response, $tabla, $dato, $patron)
+    {
+        try
+        {
+            $accesoDatos = new AccesoDatos();
+            $consulta = "SELECT * FROM $tabla WHERE $dato LIKE $patron";
+            $sentencia = $accesoDatos->_pdo->prepare($consulta);
+            $sentencia-> execute();
+            return $sentencia-> FetchAll(PDO::FETCH_ASSOC);
+        }
+        catch(PDOException $e)
+        {
+            return $response->getBody()->write(json_encode(["Error" => $e->getMessage()]));
+        }
+    }
+
 
     #endregion
 

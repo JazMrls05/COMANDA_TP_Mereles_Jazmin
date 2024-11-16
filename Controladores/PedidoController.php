@@ -11,16 +11,20 @@ class PedidoController
         $parsear_datos = $request->getParsedBody();
 
         $pedido = new Pedido($parsear_datos['codigo'],$parsear_datos['estado'], $parsear_datos['codigoMesa'],
-        $parsear_datos['sector'],$parsear_datos['tipo'],$parsear_datos['nombre'], $parsear_datos['precioTotal']);
+        $parsear_datos['cliente'],$parsear_datos['tipo'],$parsear_datos['nombre'], $parsear_datos['precioFinal']);
 
-        $array_datos = [$pedido->codigo, $pedido->estado,  $pedido->codigoMesa,
-        $pedido->sector,$pedido->tipo, $pedido->nombre, $pedido->precioTotal];
+        $array_datos = ['P' .$pedido->codigo, $pedido->estado,  $pedido->codigoMesa,
+        $pedido->cliente,$pedido->tipo, $pedido->nombre, $pedido->precioFinal];
 
         $tabla = 'pedidos';
-        $array_encabezados = ['codigo','estado','codigoMesa', 'sector', 'tipo', 'nombre','precioTotal'];
+        $array_encabezados = ['codigo','estado','codigoMesa', 'cliente','tipo', 'nombre','precioFinal'];
         
         if (AccesoDatos::insert($response, $tabla, $array_encabezados, $array_datos))
         {
+            if($parsear_datos['sacarFoto'] != '')
+            {
+                self::subirFoto($request,$response,$pedido->codigo);
+            }
             $response->getBody()->write(json_encode(["mensaje" => "Pedido $pedido->codigo cargado exitosamente"]));
         }
         else
@@ -28,6 +32,31 @@ class PedidoController
             $response->getBody()->write(json_encode(["mensaje" => "Hubo un problema al cargar el pedido $pedido->codigo"]));
         }
         return $response;
+    }
+
+    public static function SubirFoto($request, $response, $codigoMesa, $codigoPedido)
+    {
+        $carpeta_fotos = "Pedidos/Fotos/";
+        $archivo = $_FILES['fotoMesa']['name'];
+        $extension_archivo = pathinfo($archivo, PATHINFO_EXTENSION);
+
+        $nombre_archivo = $codigoMesa . "_pedido_" . $codigoPedido . ".$extension_archivo";
+        $ruta_destino = $carpeta_fotos . $nombre_archivo;
+
+        if(!file_exists($carpeta_fotos))
+        {
+            mkdir("./Pedidos/Fotos", 0777, true);
+        }
+
+        $resultado = move_uploaded_file($_FILES['fotoMesa']['tmp_name'],$ruta_destino);
+
+        if($resultado)
+        {
+            $response->getBody()->write(json_encode(["Foto" => "Foto cargada exitosamente a $rutaArchivo"]));
+        }
+        else{
+            $response->getBody()->write(json_encode(["Error" => "Ocurrió algún error al subir el fichero. No pudo cargarse<br/>"]));
+        }
     }
 
     public function GuardarDesdeCSV($request, $response)
@@ -43,10 +72,12 @@ class PedidoController
         {
             $response->getBody()->write(json_encode(["mensaje" => "Hubo un problema al cargar el pedido a $nombreArchivo"]));
         }
-
         return $response;
     }
+
     #endregion
+
+
 
     #region SELECT
     public function VerTodos($request, $response)
@@ -66,7 +97,11 @@ class PedidoController
 
     public static function VistaCliente($request, $response)
     {
-        return false;
+        $datosCliente = $request->getParsedBody();
+        $codigoMesa = $datos['codigoMesa'];
+        $numeroPedido = $datos['numeroPedido'];
+
+        //DATEDIFF
     }
     #endregion
 

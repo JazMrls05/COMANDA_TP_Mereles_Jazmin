@@ -11,14 +11,14 @@ class ProductoController
     {
         $parsear_datos = $request->getParsedBody();
 
-        $producto = new Producto($parsear_datos['tipo'],$parsear_datos['nombre'], $parsear_datos['stock'],
+        $producto = new Producto($parsear_datos['tipo'],$parsear_datos['sector'],$parsear_datos['nombre'], $parsear_datos['stock'],
         $parsear_datos['precio']);
 
-        $array_datos = [$producto->tipo, $producto->nombre, $producto->stock,
+        $array_datos = [$producto->tipo, $producto->sector, $producto->nombre, $producto->stock,
         $producto->precio];
 
         $tabla = 'productos';
-        $array_encabezados = ['tipo', 'nombre', 'stock', 'precio'];
+        $array_encabezados = ['tipo', 'sector', 'nombre', 'stock', 'precio'];
         
         if (AccesoDatos::insert($response, $tabla, $array_encabezados, $array_datos))
         {

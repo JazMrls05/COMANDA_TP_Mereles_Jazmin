@@ -5,22 +5,20 @@ class Pedido
     public $codigo;
     public $estado;
     public $codigoMesa;
-    public $sector;
+    public $cliente; // nombre para identificar al cliente
     public $tipo;
     public $nombre;
-    //public $tiempoPreparacion;
-    public $precioTotal;
+    public $precioFinal;
 
 
-    public function __construct($codigo,$estado,$codigoMesa, $sector, $tipo, $nombre/*, $tiempoPreparacion*/, $precioTotal)
+    public function __construct($codigo,$estado,$codigoMesa,$cliente, $tipo, $nombre, $precioFinal)
     {
         $this->codigo = $codigo;
         $this->estado = $estado;
         $this->codigoMesa = $codigoMesa;
-        $this->sector = $sector;
+        $this->cliente = $cliente;
         $this->tipo = $tipo;
         $this->nombre = $nombre;
-        //$this->tiempoPreparacion = $tiempoPreparacion;
-        $this->precioTotal = $precioTotal;
+        $this->precioFinal = $precioFinal;
     }
 }

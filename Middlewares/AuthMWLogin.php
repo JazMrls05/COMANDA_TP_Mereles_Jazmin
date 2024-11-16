@@ -31,7 +31,7 @@ class AuthMWLogin // Mi usuario y clave ingresados, existen?
                     'clave' => $clave,
                     'sector' => $usuario['sector']
                 );
-                $token = AutentificadorJWT::crearToken($datos);
+                $token = AuthJWT::crearToken($datos);
 
                 $payload = json_encode(array("Login" => "Logueado exitoso!",
                 "Token" => "Bearer ". $token));
