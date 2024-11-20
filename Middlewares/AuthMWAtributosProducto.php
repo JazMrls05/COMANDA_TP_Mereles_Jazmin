@@ -19,53 +19,57 @@ class AuthMWAt_producto // Ingresé los datos correspondientes del producto? par
             $stock = $parametros['stock'];
             $error = false;
 
+            $tiposValidos = ['bebida','comida'];
+            $sectoresValidos = ['cocina','barra','choperas'];
+
             $coincidencia = AccesoDatos::selectLike($response, 'productos', 'nombre', "'$nombre'");
 
-            if($tipo != 'bebida' && $tipo != 'comida' || $tipo == '')
+            if(!(in_array($tipo, $tiposValidos)))
             {
-                $mensajeError = json_encode(array("Error" => "Tipo invalido. Debe ser 'comida' o 'bebida'"));
+                $mensajeError[] = "Tipo invalido. Debe ser 'comida' o 'bebida'";
                 $error = true;
             }
 
-            if($sector != 'cocina' && $sector != 'barra' && $sector != 'choperas' || $sector == '')
+            if(!(in_array($sector, $sectoresValidos)))
             {
-                $mensajeError = json_encode(array("Error" => "Sector invalido!"));
+                $mensajeError[] = "Sector invalido!";
                 $error = true;
             }
             elseif($sector == 'cocina' && ($tipo == 'bebida'))
             {
-                $mensajeError = json_encode(array("Error" => "El sector no coincide con el tipo de comida"));
+                $mensajeError[] = "El sector no coincide con el tipo de comida";
                 $error = true;
             }
             elseif(($sector == 'choperas' || $sector == 'barra') && ($tipo == 'comida'))
             {
-                $mensajeError = json_encode(array("Error" => "El sector no coincide con el tipo de comida"));
+                $mensajeError[] = "El sector no coincide con el tipo de comida";
                 $error = true;
             }
 
             if(!empty($coincidencia) || $nombre = '')
             {
-                $mensajeError = json_encode(array("Error" => "Codigo no disponible!"));
+                $mensajeError[] = "Codigo no disponible!";
                 $error = true;
             }
 
             if($precio <= 0 || $stock <= 0)
             {
-                $mensajeError = json_encode(array("Error" => "El precio y el stock deben ser mayor a 0"));
+                $mensajeError[] = "El precio y el stock deben ser mayor a 0";
                 $error = true;
             }
 
         
             if($error == true)
             {
-                throw new Exception(json_encode(["Error"=> $mensajeError]));
+                throw new Exception(json_encode($mensajeError));
             }
 
             return $handler->handle($request); // todo ok
         }
         catch(Exception $e)
         {
-            $payload = json_encode(['Error' => $e->getMessage]);
+            $mensajeError = json_decode($e->getMessage(), true);
+            $payload = json_encode(["Errores" => $mensajeError]);
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
         }

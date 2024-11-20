@@ -10,9 +10,9 @@ class MesaController
     {
         $parsear_datos = $request->getParsedBody();
 
-        $mesa = new Mesa($parsear_datos['codigoMesa'], $parsear_datos['cantidadPersonas'], $parsear_datos['estado']);
+        $mesa = new Mesa($parsear_datos['codigoMesa'], $parsear_datos['cantidadPersonas'], "Con cliente esperando pedido");
 
-        $array_datos = ["M" . $mesa->codigoMesa, $mesa->cantidadPersonas, $mesa->estado];
+        $array_datos = ["M-" . $mesa->codigoMesa, $mesa->cantidadPersonas, $mesa->estado];
 
         $tabla = 'mesas';
         $array_encabezados = ['codigoMesa','cantidadPersonas', 'estado'];
@@ -58,14 +58,70 @@ class MesaController
     public function VerTodosPorEstado($request, $response,$args)
     {
         $estado = $args['estado'];
-        $lista_mesas = AccesoDatos::selectCriterioSTR($response, "mesas", 'estado', $estado);
-        $response->getBody()->write(json_encode(["Mesas" => $lista_mesas], JSON_PRETTY_PRINT));
+        switch($estado)
+        {
+            case 1:
+                $lista_mesas = AccesoDatos::selectCriterioSTR($response, "mesas", 'estado', 'con cliente esperando pedido');
+                $response->getBody()->write(json_encode(["Mesas" => $lista_mesas], JSON_PRETTY_PRINT));
+                break;
+            case 2: 
+                $lista_mesas = AccesoDatos::selectCriterioSTR($response, "mesas", 'estado', 'con cliente comiendo');
+                $response->getBody()->write(json_encode(["Mesas" => $lista_mesas], JSON_PRETTY_PRINT));
+                break;
+            case 3:
+                $lista_mesas = AccesoDatos::selectCriterioSTR($response, "mesas", 'estado', 'con cliente pagando');
+                $response->getBody()->write(json_encode(["Mesas" => $lista_mesas], JSON_PRETTY_PRINT));
+                break;
+            case 4:
+                $lista_mesas = AccesoDatos::selectCriterioSTR($response, "mesas", 'estado', 'cerrada');
+                $response->getBody()->write(json_encode(["Mesas" => $lista_mesas], JSON_PRETTY_PRINT));
+                break;
+            case "todos":
+                $lista_mesas = AccesoDatos::selectColumna($response, 'estado', 'mesas');
+                $response->getBody()->write(json_encode(["Mesas" => $lista_mesas], JSON_PRETTY_PRINT));
+                break;
+            default:
+                $response->getBody()->write(json_encode(["Error" => "Estado invalido"], JSON_PRETTY_PRINT));
+        }
         return $response;
     }
     #endregion
     
     #region UPDATE
     public static function ModificarEstado($request, $response, $args)
+    {
+        $codigo = $args['codigoMesa'];
+        $estado = $args['estado'];
+        $lista_pedidos = AccesoDatos::selectColumnaWhere($response, 'precioFinal','pedidos', 'codigoMesa' ,'=', $codigo);
+        $lista_precios = [];
+
+        foreach($lista_pedidos as $pedido)
+        {
+            array_push($lista_precios, $pedido['precioFinal']);
+        }
+        $precioTotal = array_sum($lista_precios);
+
+        switch($estado)
+        {
+            case 1:
+                AccesoDatos::update($response, 'mesas', 'estado', 'Con cliente esperando pedido' , 'codigoMesa', '=', $codigo);
+                $response->getBody()->write(json_encode(["Mesa $codigo" => "Ha sido modificada."], JSON_PRETTY_PRINT));
+                break;
+            case 2: 
+                AccesoDatos::update($response, 'mesas', 'estado', 'Con cliente comiendo' , 'codigoMesa', '=', $codigo);
+                $response->getBody()->write(json_encode(["Mesa $codigo" => "Los clientes estan comiendo."], JSON_PRETTY_PRINT));
+                break;
+            case 3:
+                AccesoDatos::update($response, 'mesas', 'estado', 'Con cliente pagando' , 'codigoMesa', '=', $codigo);
+                AccesoDatos::update($response, 'mesas', 'importeTotal', $precioTotal , 'codigoMesa', '=', $codigo);
+                $response->getBody()->write(json_encode(["Mesa $codigo" => "Se esta cobrando la cuenta..."], JSON_PRETTY_PRINT));
+                break;
+            default:
+                $response->getBody()->write(json_encode(["Error" => "Estado invalido"], JSON_PRETTY_PRINT));
+        }
+        return $response;
+    }
+    public static function CerrarMesa($request, $response, $args)
     {
         $codigo = $args['codigo'];
         AccesoDatos::update($response, 'mesas', 'estado', 'cerrada', 'codigo', '=', $codigo);

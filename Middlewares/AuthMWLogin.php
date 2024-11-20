@@ -26,10 +26,12 @@ class AuthMWLogin // Mi usuario y clave ingresados, existen?
             $clave == $usuario['clave'])
             {
                 $datos = array(
+                    'idEmpleado' => $usuario['id'],
                     'perfil' => $perfil,
                     'nombre' => $nombre,
                     'clave' => $clave,
                     'sector' => $usuario['sector']
+
                 );
                 $token = AuthJWT::crearToken($datos);
 

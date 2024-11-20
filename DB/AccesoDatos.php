@@ -98,7 +98,7 @@ class AccesoDatos
             $sentencia = $accesoDatos->_pdo->prepare($consulta);
             $sentencia->bindParam(":$nombreDato", $datoVal, PDO::PARAM_INT);
             $sentencia-> execute();
-            return $sentencia-> FetchAll(PDO::FETCH_ASSOC);
+            return $sentencia->FetchAll(PDO::FETCH_ASSOC);
         }
         catch(PDOException $e)
         {
@@ -123,12 +123,63 @@ class AccesoDatos
         }
     }
 
+    public static function selectCriterioSTR_AND($response, $tabla, $nombreDato ,$datoVal,$nombreDato2, $datoVal2) 
+    {
+        try
+        {
+            $accesoDatos = new AccesoDatos();
+            $consulta = "SELECT * FROM $tabla WHERE $nombreDato = :$nombreDato AND $nombreDato2 = :$nombreDato2";
+            $sentencia = $accesoDatos->_pdo->prepare($consulta);
+            $sentencia->bindParam(":$nombreDato", $datoVal, PDO::PARAM_STR);
+            $sentencia->bindParam(":$nombreDato2", $datoVal2, PDO::PARAM_STR);
+            $sentencia-> execute();
+            return $sentencia-> FetchAll(PDO::FETCH_ASSOC);
+        }
+        catch(PDOException $e)
+        {
+            return $response->getBody()->write(json_encode(["Error" => $e->getMessage()]));
+        }
+    }
+
     public static function selectLIKE($response, $tabla, $dato, $patron)
     {
         try
         {
             $accesoDatos = new AccesoDatos();
-            $consulta = "SELECT * FROM $tabla WHERE $dato LIKE $patron";
+            $consulta = "SELECT * FROM $tabla WHERE $dato LIKE :patron";
+            $sentencia = $accesoDatos->_pdo->prepare($consulta);
+            $sentencia->bindValue(':patron', $patron, PDO::PARAM_STR);
+            $sentencia-> execute();
+            return $sentencia-> FetchAll(PDO::FETCH_ASSOC);
+        }
+        catch(PDOException $e)
+        {
+            return $response->getBody()->write(json_encode(["Error" => $e->getMessage()]));
+        }
+    }
+
+    public static function selectColumna($response, $columna, $tabla)
+    {
+        try
+        {
+            $accesoDatos = new AccesoDatos();
+            $consulta = "SELECT $columna FROM $tabla";
+            $sentencia = $accesoDatos->_pdo->prepare($consulta);
+            $sentencia-> execute();
+            return $sentencia-> FetchAll(PDO::FETCH_ASSOC);
+        }
+        catch(PDOException $e)
+        {
+            return $response->getBody()->write(json_encode(["Error" => $e->getMessage()]));
+        }
+    }
+
+    public static function selectColumnaWhere($response, $columna, $tabla, $nombreDato, $signoWhere, $valorDato)
+    {
+        try
+        {
+            $accesoDatos = new AccesoDatos();
+            $consulta = "SELECT $columna FROM $tabla WHERE $nombreDato $signoWhere '$valorDato'";
             $sentencia = $accesoDatos->_pdo->prepare($consulta);
             $sentencia-> execute();
             return $sentencia-> FetchAll(PDO::FETCH_ASSOC);
@@ -149,7 +200,7 @@ class AccesoDatos
         {
             // $signoWhere refiere al '=', '>=', '<=', '>', '<' etc..
             $accesoDatos = new AccesoDatos();
-            $consulta = "UPDATE $tabla SET $datoAsetear = $valorSeteo WHERE $datoWhere $signoWhere $valorWhere";
+            $consulta = "UPDATE $tabla SET $datoAsetear = '$valorSeteo' WHERE $datoWhere $signoWhere '$valorWhere'";
             $consultaPreparada = $accesoDatos->_pdo->prepare($consulta);
             $consultaPreparada->execute();
             return true;

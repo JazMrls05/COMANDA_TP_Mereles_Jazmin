@@ -73,20 +73,35 @@ $app->group('/productos', function (RouteCollectorProxy $group) {
 });
 
 $app->group('/pedidos', function (RouteCollectorProxy $group) {
+
     $group->get('[/]', \PedidoController::class . ':VerTodos');
     $group->get('/estado/{estado}', \PedidoController::class . ':VerTodosPorEstado')->add(AuthMWUsuario::class . ':VerificarAdmin');
-    $group->get('/{codigo}', \PedidoController::class . ':VerPorCodigo');
+    $group->get('/verPorCodigo/{codigo}', \PedidoController::class . ':VerPorCodigo');
+    $group->get('/demoras', \PedidoController::class . ':VerDemoras');
+    $group->get('/pendientes', \PedidoController::class . ':VerPendientes');//->add(AuthMWUsuario::class . ':VerificarEmpleado');
+    $group->get('/listosParaServir', \PedidoController::class . ':VerListosParaServir')->add(AuthMWUsuario::class . ':VerificarMozo');
+
     $group->post('[/]', \PedidoController::class . ':Guardar')->add(AuthMWUsuario::class . ':VerificarMozo'); 
     $group->post('/csv', \PedidoController::class . ':GuardarDesdeCSV')->add(AuthMWUsuario::class . ':VerificarMozo'); 
-    $group->put('/estado/{estado}/{codigo}', \PedidoController::class . ':ModificarEstado')/*->add(AuthMWUsuario::class . ':VerificarEmpleado')*/;
-    $group->put('/tiempo/{tiempo}/{codigo}', \PedidoController::class . ':AgregarTiempoPreparacion')/*->add(AuthMWUsuario::class . ':VerificarEmpleado')*/;
+
+    $group->put('/estado/preparando/{codigo}', \PedidoController::class . ':ModificarEstadoPreparando')->add(AuthMWUsuario::class . ':VerificarEmpleado');
+    $group->put('/estado/servir/{codigo}', \PedidoController::class . ':ModificarEstadoListo')->add(AuthMWUsuario::class . ':VerificarEmpleado');
+
 });
 
+
+
 $app->group('/mesas', function (RouteCollectorProxy $group) {
+    /* Estados
+    1- Con cliente esperando pedido
+    2- Con cliente comiendo
+    3- Con cliente pagando
+    */
     $group->get('[/]', \MesaController::class . ':VerTodos');
-    $group->get('/estado/{estado}', \MesaController::class . ':VerTodosPorEstado');
-    $group->put('/estado/{estado}/{codigoMesa}', \MesaController::class . ':ModificarEstado')/*->add(AuthMWUsuario::class . ':VerificarMozo')*/;
-    $group->put('/estado/cerrar/{codigoMesa}', \MesaController::class . ':CerrarMesa')/*->add(AuthMWUsuario::class . ':VerificarAdmin')*/;
+    $group->get('/estado/{estado}', \MesaController::class . ':VerTodosPorEstado')->add(AuthMWUsuario::class . ':VerificarAdmin'); // Estados 1, 2, 3, 4, todos
+
+    $group->put('/estado/{estado}/{codigoMesa}', \MesaController::class . ':ModificarEstado')->add(AuthMWUsuario::class . ':VerificarMozo'); //Estados 1, 2 y 3
+    $group->put('/estado/cerrar/{codigoMesa}', \MesaController::class . ':CerrarMesa')->add(AuthMWUsuario::class . ':VerificarAdmin');
 });
 
 $app->get('/cliente', \PedidoController::class . ':VistaCliente');

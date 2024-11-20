@@ -21,48 +21,50 @@ class AuthMWAt_usuario // Ingresé los datos correspondientes del usuario? para 
             $fechaIngreso = $parametros['fechaIngreso'];
             $error = false;
 
-            $coincidencia = AccesoDatos::selectLike($response, 'usuarios', 'nombre', "'$nombre'");
+            $coincidencia = AccesoDatos::selectLike($response, 'usuarios', 'nombre', "$nombre");
+            $sectoresValidos = ['cocina','barra','choperas','salon'];
 
 
             if($perfil != 'empleado' || $perfil == '')
             {
-                $mensajeError = json_encode(array("Error" => "Tipo de perfil inválido."));
+                $mensajeError[] = "Tipo de perfil inválido.";
                 $error = true;
             }
 
             if (!empty($coincidencia) || $nombre == '')
             {
-                $mensajeError = json_encode(array("Error" => "Nombre no disponible!"));
+                $mensajeError[] = "Nombre no disponible!";
                 $error = true;
             }
             elseif(strlen($nombre > 20))
             {
-                $mensajeError = json_encode(array("Error" => "Nombre muy largo! Debe tener menos de 35 caracteres"));
+                $mensajeError[] = "Nombre muy largo! Debe tener menos de 35 caracteres";
                 $error = true;
             }
 
             if(strlen($clave) < 8)
             {
-                $mensajeError = json_encode(array("Error" => "La clave debe tener por lo menos 8 caracteres"));
+                $mensajeError[] = "La clave debe tener por lo menos 8 caracteres";
                 $error = true;
             }
 
-            if(($sector != 'cocina' && $sector != 'barra' && $sector != 'choperas' && $sector != 'salon') || $sector == '')
+            if(!(in_array($sector,$sectoresValidos)))
             {
-                $mensajeError = json_encode(array("Error" => "Sector inválido. Debe ser 'cocina', 'barra', 'choperas' o 'salon' "));
+                $mensajeError[] = "Sector inválido. Debe ser 'cocina', 'barra', 'choperas' o 'salon' ";
                 $error = true;
             }
 
             if($error == true)
             {
-                throw new Exception(json_encode(["Error"=> $mensajeError]));
+                throw new Exception(json_encode($mensajeError));
             }
 
             return $handler->handle($request); // todo ok
         }
         catch(Exception $e)
         {
-            $payload = json_encode(['Error' => $e->getMessage]);
+            $mensajeError = json_decode($e->getMessage(), true);
+            $payload = json_encode(["Errores" => $mensajeError]);
             $response->getBody()->write($payload);
             return $response->withHeader('Content-Type', 'application/json');
         }
