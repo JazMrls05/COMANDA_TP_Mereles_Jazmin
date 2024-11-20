@@ -1,0 +1,767 @@
+{
+	"info": {
+		"_postman_id": "528b9402-22ab-4f3f-b122-d6690148409b",
+		"name": "COMANDA",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "35095343"
+	},
+	"item": [
+		{
+			"name": "JWT",
+			"item": [
+				{
+					"name": "JWT_crearToken",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "perfilAcceso",
+									"value": "empleado",
+									"type": "text"
+								},
+								{
+									"key": "nombreAcceso",
+									"value": "Sofia",
+									"type": "text"
+								},
+								{
+									"key": "claveAcceso",
+									"value": "lalala",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:666/jwt/crearToken",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"jwt",
+								"crearToken"
+							],
+							"query": [
+								{
+									"key": "clave",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Insertar",
+			"item": [
+				{
+					"name": "Pedido",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MzIwNTE1MjAsImV4cCI6MTczMjExMTUyMCwiYXVkIjoiY2YzMDgyNGY0NmE4YzcyODQ5YmZiYTQ3NzhjYjhiMWIwM2ZjYzE4MyIsImRhdGEiOnsiaWRFbXBsZWFkbyI6OSwicGVyZmlsIjoiZW1wbGVhZG8iLCJub21icmUiOiJTb2ZpYSIsImNsYXZlIjoibGFsYWxhIiwic2VjdG9yIjoic2Fsb24ifSwiYXBwIjoiVFAgQ29tYW5kYSJ9.Y0PXJCTS-W96Y-bcH3p3pPTT-KLcJ-sdH0M7HlwGIZQ",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "codigo",
+									"value": "bh56",
+									"type": "text"
+								},
+								{
+									"key": "estado",
+									"value": "Pendiente",
+									"type": "text"
+								},
+								{
+									"key": "codigoMesa",
+									"value": "M-m35a",
+									"type": "text"
+								},
+								{
+									"key": "cliente",
+									"value": "sara",
+									"type": "text"
+								},
+								{
+									"key": "sector",
+									"value": "choperas",
+									"type": "text"
+								},
+								{
+									"key": "nombre",
+									"value": "corona",
+									"type": "text"
+								},
+								{
+									"key": "precioFinal",
+									"value": "100",
+									"type": "text"
+								},
+								{
+									"key": "sacarFoto",
+									"type": "file",
+									"src": "/C:/Users/jazmi/Downloads/personas.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:666/pedidos",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mesa",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MzIwNTE0MjEsImV4cCI6MTczMjExMTQyMSwiYXVkIjoiY2YzMDgyNGY0NmE4YzcyODQ5YmZiYTQ3NzhjYjhiMWIwM2ZjYzE4MyIsImRhdGEiOnsiaWRFbXBsZWFkbyI6MywicGVyZmlsIjoiYWRtaW4iLCJub21icmUiOiJKYXptaW4iLCJjbGF2ZSI6IlNvY2lvIiwic2VjdG9yIjoiYWRtaW5pc3RyYWNpb24ifSwiYXBwIjoiVFAgQ29tYW5kYSJ9.GV8_gC6SWcUvDuLq5QlUdwLSxoay3Z3ETb92AHHQeV0",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "codigoMesa",
+									"value": "m35a",
+									"type": "text"
+								},
+								{
+									"key": "cantidadPersonas",
+									"value": "2",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:666/insertar/mesas",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"insertar",
+								"mesas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Usuario",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MzE2MjA3MTUsImV4cCI6MTczMTY4MDcxNSwiYXVkIjoiY2YzMDgyNGY0NmE4YzcyODQ5YmZiYTQ3NzhjYjhiMWIwM2ZjYzE4MyIsImRhdGEiOnsicGVyZmlsIjoiYWRtaW4iLCJub21icmUiOiJBZ3VzdGluIiwiY2xhdmUiOiJTb2NpbyIsInNlY3RvciI6ImFkbWluaXN0cmFjaW9uIn0sImFwcCI6IlRQIENvbWFuZGEifQ.6kizHz-ZDoRkX7dAtW2SQELQFSx5uHKFCiEf_DvPvBU",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "perfil",
+									"value": "empleado",
+									"type": "text"
+								},
+								{
+									"key": "nombre",
+									"value": "Pepita",
+									"type": "text"
+								},
+								{
+									"key": "clave",
+									"value": "jejeje",
+									"type": "text"
+								},
+								{
+									"key": "sector",
+									"value": "salon",
+									"type": "text"
+								},
+								{
+									"key": "fechaIngreso",
+									"value": "",
+									"description": "Fecha actual por default. y sino seguir formato dd-mm-AAAA",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:666/insertar/usuarios",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"insertar",
+								"usuarios"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Producto",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MzE2MjQ3NjEsImV4cCI6MTczMTY4NDc2MSwiYXVkIjoiY2YzMDgyNGY0NmE4YzcyODQ5YmZiYTQ3NzhjYjhiMWIwM2ZjYzE4MyIsImRhdGEiOnsicGVyZmlsIjoiYWRtaW4iLCJub21icmUiOiJBZ3VzdGluIiwiY2xhdmUiOiJTb2NpbyIsInNlY3RvciI6ImFkbWluaXN0cmFjaW9uIn0sImFwcCI6IlRQIENvbWFuZGEifQ.djxOMan99fi3_S49G8Gw0Aokef6ToxJYz6V76_9E9bM",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "tipo",
+									"value": "comida",
+									"type": "text"
+								},
+								{
+									"key": "sector",
+									"value": "cocina",
+									"type": "text"
+								},
+								{
+									"key": "nombre",
+									"value": "hamburguesa de garbanzo",
+									"type": "text"
+								},
+								{
+									"key": "precio",
+									"value": "1400",
+									"type": "text"
+								},
+								{
+									"key": "stock",
+									"value": "20",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "localhost:666/insertar/productos",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"insertar",
+								"productos"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Eliminar",
+			"item": [
+				{
+					"name": "UsuarioID",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/eliminar/usuarios/id",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"eliminar",
+								"usuarios",
+								"id"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ProductoID",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/eliminar/productos/id",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"eliminar",
+								"productos",
+								"id"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PedidoCodigo",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/eliminar/pedidos/codigo",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"eliminar",
+								"pedidos",
+								"codigo"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "MesaCodigo",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/eliminar/mesas",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"eliminar",
+								"mesas"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Modificar",
+			"item": [
+				{
+					"name": "ModificarEstadoMesa",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MzIwNDQyNDcsImV4cCI6MTczMjEwNDI0NywiYXVkIjoiY2YzMDgyNGY0NmE4YzcyODQ5YmZiYTQ3NzhjYjhiMWIwM2ZjYzE4MyIsImRhdGEiOnsiaWRFbXBsZWFkbyI6MTAsInBlcmZpbCI6ImVtcGxlYWRvIiwibm9tYnJlIjoiR2VyYWxkaW4iLCJjbGF2ZSI6ImxpbGlsaSIsInNlY3RvciI6ImJhcnJhIn0sImFwcCI6IlRQIENvbWFuZGEifQ.S9S5wTjv5H1z85qeYrPjxWT6oFMVnUQg9Jhq8euL0mg",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:666/mesas/estado/3/M345",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"estado",
+								"3",
+								"M345"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PrepararPedido",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/pedidos/estado/preparando/{codigo}",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos",
+								"estado",
+								"preparando",
+								"{codigo}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CerrarMesa",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/mesas/estado/cerrar/{codigo}",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"estado",
+								"cerrar",
+								"{codigo}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "ServirPedido",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/pedidos/estado/servir/{codigo}",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos",
+								"estado",
+								"servir",
+								"{codigo}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Obtener",
+			"item": [
+				{
+					"name": "VerUsuariosTodos",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MzIwNDM0OTAsImV4cCI6MTczMjEwMzQ5MCwiYXVkIjoiY2YzMDgyNGY0NmE4YzcyODQ5YmZiYTQ3NzhjYjhiMWIwM2ZjYzE4MyIsImRhdGEiOnsiaWRFbXBsZWFkbyI6MTAsInBlcmZpbCI6ImVtcGxlYWRvIiwibm9tYnJlIjoiR2VyYWxkaW4iLCJjbGF2ZSI6ImxpbGlsaSIsInNlY3RvciI6ImJhcnJhIn0sImFwcCI6IlRQIENvbWFuZGEifQ.8Vup6qZID1lZD22jABPDZZ7glVmCvCtm7zDvRNZ4EIk",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "localhost:666/usuarios",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VerUsuariosID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/usuarios/{id}",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios",
+								"{id}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VerUsuariosSector",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/usuarios/Sector/{sector}",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"usuarios",
+								"Sector",
+								"{sector}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VerProductosTodos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/productos",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"productos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VerProductosTipo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/productos/{tipo}",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"productos",
+								"{tipo}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VerPedidosTodos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/pedidos",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VerPedidosEstado",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/pedidos/estado/{estado}",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos",
+								"estado",
+								"{estado}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VerPedidosCodigo",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/pedidos/verPorCodigo/{codigo}",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos",
+								"verPorCodigo",
+								"{codigo}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VerDemoras",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/demoras",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"demoras"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VerPedidosParaServir",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/pedidos/listosParaServir",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos",
+								"listosParaServir"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VerMesasTodos",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/mesas",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VerMesaEstado",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/mesas/{estado}/{codigoMesa}",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"mesas",
+								"{estado}",
+								"{codigoMesa}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VistaCliente",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:666/insertar/cliente?codigoMesa=M-&codigoPedido=P-",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"insertar",
+								"cliente"
+							],
+							"query": [
+								{
+									"key": "codigoMesa",
+									"value": "M-"
+								},
+								{
+									"key": "codigoPedido",
+									"value": "P-"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "VerPendientes",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE3MzIwNTY0NzEsImV4cCI6MTczMjExNjQ3MSwiYXVkIjoiY2YzMDgyNGY0NmE4YzcyODQ5YmZiYTQ3NzhjYjhiMWIwM2ZjYzE4MyIsImRhdGEiOnsiaWRFbXBsZWFkbyI6MTEsInBlcmZpbCI6ImVtcGxlYWRvIiwibm9tYnJlIjoiQWlsaSIsImNsYXZlIjoibG9sb2xvIiwic2VjdG9yIjoiY2hvcGVyYXMifSwiYXBwIjoiVFAgQ29tYW5kYSJ9.wDWjoh4FUrMQqj4ngR2ZeV1p_slhZaG8NfcQA1RcnL0",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:666/pedidos/pendientes",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "666",
+							"path": [
+								"pedidos",
+								"pendientes"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
