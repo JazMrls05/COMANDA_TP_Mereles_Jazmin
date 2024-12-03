@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../Modelos/Producto.php';
+require_once __DIR__ . '/../Modelos/SerializadoraCSV.php';
 require_once __DIR__ . '/../DB/AccesoDatos.php';
 
 class ProductoController
@@ -9,10 +10,10 @@ class ProductoController
     #region INSERT
     public function Guardar($request, $response)
     {
-        $parsear_datos = $request->getParsedBody();
+        $datos = $request->getParsedBody();
 
-        $producto = new Producto($parsear_datos['tipo'],$parsear_datos['sector'],$parsear_datos['nombre'], $parsear_datos['stock'],
-        $parsear_datos['precio']);
+        $producto = new Producto($datos['tipo'],$datos['sector'],$datos['nombre'], $datos['stock'],
+        $datos['precio']);
 
         $array_datos = [$producto->tipo, $producto->sector, $producto->nombre, $producto->stock,
         $producto->precio];
@@ -84,4 +85,36 @@ class ProductoController
         return $response;
     }
     #endregion
+
+    public static function descargarCSV($request, $response)
+    {
+        $serializadoraCSV = new SerializadoraCSV();
+        $datos = $serializadoraCSV->leerCSV();
+    
+        $encabezados = ['tipo', 'sector', 'nombre', 'precio', 'stock'];
+        $contenidoCSV = implode(',', $encabezados) . "\n";
+    
+        foreach ($datos as $elemento) 
+        {
+            $tipo = $elemento['tipo'];
+            $sector = $elemento['sector'];
+            $nombre = $elemento['nombre'];
+            $precio = $elemento['precio'];
+            $stock = $elemento['stock'];
+            
+            $contenidoCSV .= implode(',', 
+            [
+                $tipo, 
+                $sector,
+                $nombre,
+                $precio,
+                $stock
+            ]) . "\n";
+        }
+
+        $response = $response->withHeader('Content-Type', 'text/csv')->withHeader('Content-Disposition', 'attachment; filename="productos.csv"');
+        $response->getBody()->write($contenidoCSV);
+
+        return $response;
+    }
 }

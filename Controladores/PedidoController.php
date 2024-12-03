@@ -9,22 +9,26 @@ class PedidoController
     #region INSERT
     public function Guardar($request, $response)
     {
-        $parsear_datos = $request->getParsedBody();
+        $datos = $request->getParsedBody();
 
-        $pedido = new Pedido($parsear_datos['codigo'],'Pendiente', $parsear_datos['codigoMesa'],
-        $parsear_datos['cliente'],$parsear_datos['sector'],$parsear_datos['nombre'], $parsear_datos['precioFinal']);
+        $pedido = new Pedido($datos['codigo'], $datos['idComanda'], 'Pendiente', $datos['codigoMesa'],
+        $datos['cliente'],$datos['sector'],$datos['nombre'], $datos['precioFinal']);
 
-        $array_datos = ['P-' .$pedido->codigo, $pedido->estado,  $pedido->codigoMesa,
+        $array_datos = ['P-' .$pedido->codigo, $pedido->idComanda, $pedido->estado,'M-'.$pedido->codigoMesa,
         $pedido->cliente,$pedido->sector, $pedido->nombre, $pedido->precioFinal];
 
         $tabla = 'pedidos';
-        $array_encabezados = ['codigo','estado','codigoMesa', 'cliente','sector', 'nombre','precioFinal'];
+        $array_encabezados = ['codigo','idComanda','estado','codigoMesa', 'cliente','sector', 'nombre','precioFinal'];
         
         if (AccesoDatos::insert($response, $tabla, $array_encabezados, $array_datos))
         {
             if(isset($_FILES['sacarFoto']))
             {
                 self::SubirFoto($request,$response,$pedido->codigoMesa, $pedido->codigo);
+            }
+            else
+            {
+                $response->getBody()->write(json_encode(["mensaje" => "Foto no seteada."]));
             }
 
             $response->getBody()->write(json_encode(["mensaje" => "Pedido $pedido->codigo cargado exitosamente"]));
@@ -33,16 +37,18 @@ class PedidoController
         {
             $response->getBody()->write(json_encode(["mensaje" => "Hubo un problema al cargar el pedido $pedido->codigo"]));
         }
-        return $response;
+        return $response->withHeader('Content-Type', 'application/json');
     }
 
     public static function SubirFoto($request, $response, $codigoMesa, $codigoPedido)
     {
         $carpeta_fotos = "Pedidos/Fotos/";
         $archivo = $_FILES['sacarFoto']['name'];
-        $extension_archivo = pathinfo($archivo, PATHINFO_EXTENSION);
+        $tipoArchivo = $_FILES['sacarFoto']['type'];
+        $tamañoArchivo = $_FILES['sacarFoto']['size'];
+        $extensionArchivo = pathinfo($archivo, PATHINFO_EXTENSION);
 
-        $nombre_archivo = $codigoMesa . "_pedido_" . $codigoPedido . ".$extension_archivo";
+        $nombre_archivo = $codigoMesa . "_pedido_" . $codigoPedido . ".$extensionArchivo";
         $ruta_destino = $carpeta_fotos . $nombre_archivo;
 
         if(!file_exists($carpeta_fotos))
@@ -50,35 +56,27 @@ class PedidoController
             mkdir("./Pedidos/Fotos", 0777, true);
         }
 
-        $resultado = move_uploaded_file($_FILES['sacarFoto']['tmp_name'],$ruta_destino);
-
-        if($resultado)
+        if(!((strpos($tipoArchivo,"png")|| strpos($tipoArchivo, "jpeg")) && ($tamañoArchivo < 300000)))
         {
-            $response->getBody()->write(json_encode(["Foto" => "Foto cargada exitosamente a $ruta_destino"]));
-        }
-        else{
-            $response->getBody()->write(json_encode(["Error" => "Ocurrió algún error al subir el fichero. No pudo cargarse<br/>"]));
-        }
-    }
-
-    public function GuardarDesdeCSV($request, $response)
-    {
-        $tabla = 'pedidos';
-        $nombreArchivo = 'pedido.csv';
-        
-        if (AccesoDatos::insertDesdeCSV($response, $tabla, $nombreArchivo))
-        {
-            $response->getBody()->write(json_encode(["mensaje" => "Pedido cargado exitosamente a $nombreArchivo"]));
+            $response->getBody()->write(json_encode(["Error" => "La extension o el tamaño del archivos no es correcta"]));
         }
         else
         {
-            $response->getBody()->write(json_encode(["mensaje" => "Hubo un problema al cargar el pedido a $nombreArchivo"]));
+            $resultado = move_uploaded_file($_FILES['sacarFoto']['tmp_name'],$ruta_destino);
+
+            if($resultado)
+            {
+                $response->getBody()->write(json_encode(["Foto" => "Foto cargada exitosamente a $ruta_destino"]));
+            }
+            else{
+                $response->getBody()->write(json_encode(["Error" => "Ocurrió algún error al subir el fichero. No pudo cargarse<br/>"]));
+            }
         }
-        return $response;
+
     }
 
-    #endregion
 
+    #endregion
 
 
     #region SELECT
@@ -87,41 +85,6 @@ class PedidoController
         $lista_pedidos = AccesoDatos::selectAll($response, "pedidos");
         $response->getBody()->write(json_encode(["Pedidos" => $lista_pedidos], JSON_PRETTY_PRINT));
         return $response->withHeader('Content-Type', 'application/json');
-    }
-
-    public static function VerPorCodigo($request, $response, $args)
-    {
-        $codigo = $args['codigo'];
-        $lista_pedidos = AccesoDatos::selectCriterioSTR($response, "pedidos", 'codigo', $codigo);
-        $response->getBody()->write(json_encode(["Pedidos" => $lista_pedidos], JSON_PRETTY_PRINT));
-        return $response->withHeader('Content-Type', 'application/json');
-    }
-
-    public static function VerTodosPorEstado($request, $response, $args)
-    {
-        $estado = $args['estado'];
-        switch($estado)
-        {
-            case 1:
-                $lista_pedidos = AccesoDatos::selectCriterioSTR($response, "pedidos", 'estado', 'Pendiente');
-                $response->getBody()->write(json_encode(["Pedidos" => $lista_pedidos], JSON_PRETTY_PRINT));
-                break;
-            case 2: 
-                $lista_pedidos = AccesoDatos::selectCriterioSTR($response, "pedidos", 'estado', 'En preparacion');
-                $response->getBody()->write(json_encode(["Pedidos" => $lista_pedidos], JSON_PRETTY_PRINT));
-                break;
-            case 3:
-                $lista_pedidos = AccesoDatos::selectCriterioSTR($response, "pedidos", 'estado', 'listo para servir');
-                $response->getBody()->write(json_encode(["Pedidos" => $lista_pedidos], JSON_PRETTY_PRINT));
-                break;
-            case "todos":
-                $lista_pedidos = AccesoDatos::selectColumna($response, 'estado', 'pedidos');
-                $response->getBody()->write(json_encode(["Pedidos" => $lista_pedidos], JSON_PRETTY_PRINT));
-                break;
-            default:
-                $response->getBody()->write(json_encode(["Error" => "Estado invalido"], JSON_PRETTY_PRINT));
-        }
-        return $response;
     }
 
     public static function VerPendientes($request, $response)
@@ -135,9 +98,7 @@ class PedidoController
 
     public static function VerListosParaServir($request, $response)
     {
-        $token = AuthJWT::ObtenerToken($request);
-        $sector = AuthJWT::ObtenerData($token)->sector;
-        $lista_pedidos = AccesoDatos::selectCriterioSTR_AND($response, "pedidos", 'estado', 'Listos para servir', 'sector', $sector);
+        $lista_pedidos = AccesoDatos::selectCriterioSTR($response, "pedidos", 'estado', 'Listo para servir');
         $response->getBody()->write(json_encode(["Pedidos" => $lista_pedidos], JSON_PRETTY_PRINT));
         return $response->withHeader('Content-Type', 'application/json');
     }
@@ -157,30 +118,26 @@ class PedidoController
             {
                 if($pedido['estado'] == 'En preparacion')
                 {
-                    $response->getBody()->write(json_encode(["Pedido $codigo" => "Estará listo a las $horaEstimada"], JSON_PRETTY_PRINT));
+                    $response->getBody()->write(json_encode(["Pedido $codigoPedido" => "Estara listo a las $horaEstimada aproximadamente"], JSON_PRETTY_PRINT));
                 }
                 else
                 {
-                    $response->getBody()->write(json_encode(["Pedido $codigo" => "No se esta prepando aun"], JSON_PRETTY_PRINT));
+                    $response->getBody()->write(json_encode(["Pedido $codigoPedido" => "No se esta preparando aun"], JSON_PRETTY_PRINT));
                 }
-                
+                break;
             }
         }
 
-        return $response;
+        return $response->withHeader('Content-Type', 'application/json');
 
     }
 
     public static function VerDemoras($request, $response)
     {
-        $lista_pedidos = AccesoDatos::selectAll($response, 'pedidos');
-
-        foreach($lista_pedidos as $pedido)
-        {
-            
-        }
-        
-        return $response;
+        $columnas = 'codigo, preparacionEstimada';
+        $listaDemoras = AccesoDatos::selectColumna($response, $columnas,'pedidos');
+        $response->getBody()->write(json_encode(["Pedidos y sus demoras" => $listaDemoras], JSON_PRETTY_PRINT));
+        return $response->withHeader('Content-Type', 'application/json');
     }
 
     #endregion
@@ -236,7 +193,7 @@ class PedidoController
 
 
         
-        return $response;
+        return $response->withHeader('Content-Type', 'application/json');
     }
 
     public static function ModificarEstadoListo($request, $response, $args)
@@ -275,7 +232,7 @@ class PedidoController
 
 
         
-        return $response;
+        return $response->withHeader('Content-Type', 'application/json');
     }
     #endregion
 
@@ -285,7 +242,7 @@ class PedidoController
         $codigo = $args['codigo'];
         AccesoDatos::deleteCodigo($response, "pedidos", "codigo", $codigo);
         $response->getBody()->write(json_encode(["Pedido $codigo" => "Fue eliminado exitosamente"], JSON_PRETTY_PRINT));
-        return $response;
+        return $response->withHeader('Content-Type', 'application/json');
     }
     #endregion
 

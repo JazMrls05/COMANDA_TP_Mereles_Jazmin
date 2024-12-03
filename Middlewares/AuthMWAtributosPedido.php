@@ -5,17 +5,6 @@ use Slim\Psr7\Response as ResponseMW;
 
 class AuthMWAt_pedido // Ingresé los datos correspondientes del pedido? para la solicitud INSERT
 {
-    /*
-    * codigoMesa: coincida con una mesa existente, cuyo estado no sea "cerrada"
-    *nombre (de la comida): exista en la tabla de productos y coincida su tipo
-    *Cliente: nombre del cliente. 
-
-    Lógica de pedidos y clientes:
-    - Si se eligió una mesa para dos por ejemplo, solo dos nombres de clientes podrán ser ingresados:
-    Mesa M23rt: pide agustín, pide Franco; Jaz no puede pedir en esa mesa hasta que los clientes se hayan ido, y la mesa quede desocupada.
-    se emitirá un mensaje de "mesa ocupada" en tal caso. Se podrá hacer una sugerencia de mesas disponibles o muy rebuscado?
-    */
-
     public function __invoke(Request $request, RequestHandler $handler): ResponseMW
     {   
         try
@@ -25,9 +14,7 @@ class AuthMWAt_pedido // Ingresé los datos correspondientes del pedido? para la
 
             $codigo = $parametros['codigo']; 
             $codigoMesa = $parametros['codigoMesa'];
-            //$cliente = $parametros['cliente'];
             $sector = $parametros['sector'];
-            $tipo = $parametros['tipo'];
             $nombre = $parametros['nombre']; 
             $precioFinal = $parametros['precioFinal']; 
 
@@ -36,6 +23,15 @@ class AuthMWAt_pedido // Ingresé los datos correspondientes del pedido? para la
 
             $coincidenciaCod_pedido = AccesoDatos::selectLike($response, 'pedidos', 'codigo', "P-$codigo");
             $coincidenciaCod_mesa = AccesoDatos::selectLike($response, 'mesas', 'codigoMesa', "M-$codigoMesa");
+
+            $estadoMesa = AccesoDatos::selectColumnaWhere($response, 'estado', 'mesas', 'codigoMesa', '=', $codigoMesa);
+            $mesa = $estadoMesa[0];
+
+            if($mesa['estado'] == 'Cerrada')
+            {
+                $mensajeError[] = "La mesa $codigoMesa está cerrada, usar otra mesa";
+                $error = true;
+            }
 
             #region Código
             $patron1 = "/[a-zA-Z]/"; // hay letras?

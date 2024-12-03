@@ -30,11 +30,16 @@ class AuthMWUsuario // Sos admin o empleado?. Si sos empleado, de qué sector?
         $response = new ResponseMW();
         $token = AuthJWT::ObtenerToken($request);
         $perfil = AuthJWT::ObtenerData($token)->perfil;
+        $estado = AuthJWT::ObtenerData($token)->estado;
 
-        if ($perfil == 'empleado')
+        if ($perfil == 'empleado' && $estado == 'Libre')
         {
             $response->getBody()->write(json_encode(array('Login' => 'Empleado verificado!')));
             $response = $handler->handle($request);
+        }
+        elseif($perfil == 'empleado' && $estado == 'Inhabilitado')
+        {
+            $response->getBody()->write(json_encode(array('Error' => 'Empleado inhabilitado')));
         }
         else
         {
@@ -52,11 +57,16 @@ class AuthMWUsuario // Sos admin o empleado?. Si sos empleado, de qué sector?
         $token = AuthJWT::ObtenerToken($request);
         $perfil = AuthJWT::ObtenerData($token)->perfil;
         $sector = AuthJWT::ObtenerData($token)->sector;
+        $estado = AuthJWT::ObtenerData($token)->estado;
 
         if ($perfil === 'empleado' && $sector === 'salon')
         {
             $response->getBody()->write(json_encode(array('Login' => 'Mozo verificado!')));
             $response = $handler->handle($request);
+        }
+        elseif($perfil === 'empleado' && $sector === 'salon' && $estado == 'Inhabilitado')
+        {
+            $response->getBody()->write(json_encode(array('Error' => 'Empleado inhabilitado')));
         }
         else
         {

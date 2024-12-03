@@ -3,6 +3,7 @@
 class Pedido
 {
     public $codigo;
+    public $idComanda;
     public $estado;
     public $codigoMesa;
     public $cliente; 
@@ -11,9 +12,10 @@ class Pedido
     public $precioFinal;
 
 
-    public function __construct($codigo,$estado,$codigoMesa,$cliente, $sector, $nombre, $precioFinal)
+    public function __construct($codigo, $idComanda, $estado, $codigoMesa, $cliente, $sector, $nombre, $precioFinal)
     {
         $this->codigo = $codigo;
+        $this->idComanda = $idComanda;
         $this->estado = $estado;
         $this->codigoMesa = $codigoMesa;
         $this->cliente = $cliente;

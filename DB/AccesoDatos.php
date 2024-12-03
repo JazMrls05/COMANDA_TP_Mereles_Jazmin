@@ -42,27 +42,7 @@ class AccesoDatos
         try
         {
 
-            if (($archivo = fopen($nombreArchivo, "r")) !== false) 
-            {
-                $accesoDatos = new AccesoDatos();
-                $encabezados = fgetcsv($archivo, 1000, ","); /* El archivo csv que pase, va a tener encabezados con los mismos nombres
-                de las columnas de la respectiva tabla*/
-                $valores = implode(',', array_fill(0, count($encabezados), '?'));
-                $consulta = "INSERT INTO $tabla ($encabezados) VALUES ($valores)";
-                $consultaPreparada = $accesoDatos->_pdo->prepare($consulta);
 
-                while (($datos = fgetcsv($archivo, 1000, ",")) !== false)
-                {
-                    $consultaPreparada->execute($datos);
-                }
-
-                fclose($archivo);
-                $response->getBody()->write(json_encode(["Mensaje" => "Datos cargados exitosamente"]));
-            }
-            else
-            {
-                $response->getBody()->write(json_encode(["Mensaje" => "Hubo un probelam al intentar abrir el archivo"]));
-            }
 
         }
         catch(PDOException $e)
@@ -190,6 +170,41 @@ class AccesoDatos
         }
     }
 
+    public static function selectMayorCantidad($response, $columna, $tabla, $elemento)
+    {
+        try
+        {
+            $accesoDatos = new AccesoDatos();
+            $consulta = "SELECT $columna FROM $tabla ORDER BY $elemento DESC LIMIT 1";
+            $sentencia = $accesoDatos->_pdo->prepare($consulta);
+            $sentencia->execute();
+            return $sentencia->FetchAll(PDO::FETCH_ASSOC);
+        }
+        catch(PDOException $e)
+        {
+            return $response->getBody()->write(json_encode(["Error" => $e->getMessage()]));
+        }
+    }
+
+    public static function promedioYmejorElemento($response)
+    {
+        try
+        {
+            $accesoDatos = new AccesoDatos();
+            $consulta = "SELECT codigoPedido, comentario,
+            (puntajeMesa + puntajeRestaurante + puntajeMozo + puntajeCocinero) / 4 AS promedio
+            FROM encuestas
+            ORDER BY promedio DESC 
+            LIMIT 3";
+            $sentencia = $accesoDatos->_pdo->prepare($consulta);
+            $sentencia->execute();
+            return $sentencia->FetchAll(PDO::FETCH_ASSOC);
+        }
+        catch(PDOException $e)
+        {
+            return $response->getBody()->write(json_encode(["Error" => $e->getMessage()]));
+        }
+    }
 
     #endregion
 
@@ -202,6 +217,46 @@ class AccesoDatos
             $accesoDatos = new AccesoDatos();
             $consulta = "UPDATE $tabla SET $datoAsetear = '$valorSeteo' WHERE $datoWhere $signoWhere '$valorWhere'";
             $consultaPreparada = $accesoDatos->_pdo->prepare($consulta);
+            $consultaPreparada->execute();
+            return true;
+        }
+        catch(PDOException $e)
+        {
+            return $response->getBody()->write(json_encode(["Error" => $e->getMessage()]));
+        }
+    }
+
+    public static function SumarCantidad($response, $tabla, $codigoMesa)
+    {
+        try
+        {
+            $accesoDatos = new AccesoDatos();
+            $consulta = "UPDATE $tabla SET usoMesa = usoMesa + 1 WHERE codigoMesa = ?";
+            $consultaPreparada = $accesoDatos->_pdo->prepare($consulta);
+            $consultaPreparada->bindParam(1, $codigoMesa, PDO::PARAM_STR);
+            $consultaPreparada->execute();
+            return true;
+        }
+        catch(PDOException $e)
+        {
+            return $response->getBody()->write(json_encode(["Error" => $e->getMessage()]));
+        }
+    }
+
+    public static function updateImporteComanda($request, $response)
+    {
+        $codigoMesa = $request->getAttribute('codigoMesa');
+        try
+        {
+            $accesoDatos = new AccesoDatos();
+            $consulta = "UPDATE comandas SET importeTotal = (
+                SELECT SUM(precioFinal)
+                FROM pedidos
+                WHERE pedidos.idComanda = comandas.id
+                AND pedidos.codigoMesa = :codigoMesa
+            )";
+            $consultaPreparada = $accesoDatos->_pdo->prepare($consulta);
+            $consultaPreparada->bindParam(':codigoMesa', $codigoMesa, PDO::PARAM_STR);
             $consultaPreparada->execute();
             return true;
         }

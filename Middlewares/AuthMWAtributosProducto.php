@@ -21,7 +21,6 @@ class AuthMWAt_producto // Ingresé los datos correspondientes del producto? par
 
             $tiposValidos = ['bebida','comida'];
             $sectoresValidos = ['cocina','barra','choperas'];
-
             $coincidencia = AccesoDatos::selectLike($response, 'productos', 'nombre', "'$nombre'");
 
             if(!(in_array($tipo, $tiposValidos)))

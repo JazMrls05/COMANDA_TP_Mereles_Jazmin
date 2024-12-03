@@ -12,6 +12,5 @@ class Mesa
         $this->cantidadPersonas = $cantidadPersonas;
         $this->estado = $estado;
 
-
     }
 }
